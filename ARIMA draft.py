@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.stattools import adfuller
 import numpy as np
 
 tickerSymbols = ['AAPL', '^GSPC']
@@ -25,13 +26,16 @@ msk = (monthly_average.index < len(monthly_average)-30)
 df_train = monthly_average[msk].copy()
 df_test = monthly_average[~msk].copy()
 
-print(df_train)
-
 #Checking for stationarity of time series
 
 #Method 1 - ACF and PACF plot
-#acf_original = plot_acf(df_train)
+acf_original = plot_acf(df_train)
 
-#pacf_original = plot_pacf(df_train)
+pacf_original = plot_pacf(df_train)
 
 #plt.show()
+
+#Method 2 - ADF Test
+
+adf_test = adfuller(df_train)
+#print(f'p-value: {adf_test[1]}')
