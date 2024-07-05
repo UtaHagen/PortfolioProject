@@ -22,6 +22,14 @@ monthly_average = monthly_average.reset_index(drop = True)
 #examining the data
 monthly_average.plot(label = tickerSymbol)
 
+# create a differenced series
+def difference(monthly_average, interval=1):
+ diff = list()
+ for i in range(interval, len(dataset)):
+ value = dataset[i] - dataset[i - interval]
+ diff.append(value)
+ return Series(diff)
+
 msk = (monthly_average.index < len(monthly_average)-30)
 df_train = monthly_average[msk].copy()
 df_test = monthly_average[~msk].copy()
@@ -33,7 +41,7 @@ acf_original = plot_acf(df_train)
 
 pacf_original = plot_pacf(df_train)
 
-#plt.show()
+plt.show()
 
 #Method 2 - ADF Test
 
