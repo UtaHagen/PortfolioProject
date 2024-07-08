@@ -46,4 +46,4 @@ plt.show()
 #Method 2 - ADF Test
 
 adf_test = adfuller(df_train)
-#print(f'p-value: {adf_test[1]}')
+print(f'p-value: {adf_test[1]}')
