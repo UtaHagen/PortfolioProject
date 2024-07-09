@@ -25,17 +25,13 @@ ffunds['DATE'] = pd.to_datetime(ffunds['DATE'])
 ffunds.set_index('DATE', inplace=True)
 ffunds.index = ffunds.index.to_period('M').to_timestamp('M')
 
-#working site
+#resampling stock data to be on the monthly frequency
 monthly_aapl = aapl.resample('ME').mean()
 monthly_sp500 = sp500.resample('ME').mean()
 
 #editted the shift to reflect the data's employment of a monthly frequency
 monthly_aapl['Return'] = (monthly_aapl['Close'].shift(-1) - monthly_aapl['Close']) / monthly_aapl['Close']
 monthly_sp500['Return'] = (monthly_sp500['Close'].shift(-1) - monthly_sp500['Close']) / monthly_sp500['Close']
-#working site
-
-#print(aapl[['Close', 'Return']].head(25))
-#print(sp500[['Close', 'Return']].head(25))
 
 data = pd.DataFrame(index=aapl.index)
 data['AAPL_Return'] = monthly_aapl['Return']
