@@ -1,11 +1,3 @@
-#sterile environment
-
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import pandas as pd
 import yfinance as yf
 from sklearn.model_selection import train_test_split
@@ -57,19 +49,13 @@ new_data = X_test.iloc[-1:].copy()
 prediction = model.predict(new_data)
 print("Prediction: ", "AAPL will outperform S&P 500" if prediction[0] == 1 else "AAPL will underperform S&P 500")
 
-
-# In[2]:
-
-
+#RFM
 from sklearn.model_selection import cross_val_score
 scores = cross_val_score(model, X, y, cv=5)
 print(f"Cross-Validation Scores: {scores}")
 print(f"Mean CV Score: {scores.mean()}")
 
-
-# In[3]:
-
-
+#Model Validation
 import matplotlib.pyplot as plt
 importances = model.feature_importances_
 feature_names = X.columns
@@ -78,10 +64,6 @@ plt.xlabel("Feature Importance")
 plt.ylabel("Feature")
 plt.title("Feature Importance in Random Forest Model")
 plt.show()
-
-
-# In[4]:
-
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 cm = confusion_matrix(y_test, y_pred)
