@@ -4,7 +4,9 @@ import statsmodels.api as sm
 from itertools import chain, combinations
 
 #Data port + manipulation (aapl)
+aaplWR = yf.download('AAPL', start='2008-12-31', end='2024-01-01', progress=False)
 aapl = yf.download('AAPL', start='2010-01-01', end='2024-01-01', progress=False)
+monthly_aaplWR = aaplWR.resample('ME').mean()
 monthly_aapl = aapl.resample('ME').mean()
 
 #Federal Funds Port + Manipulation
@@ -18,19 +20,24 @@ ffunds.set_index('DATE', inplace=True)
 ffunds.index = ffunds.index.to_period('M').to_timestamp('M')
 
 #William %R - Data manipulation
-high14 = monthly_aapl['High'].rolling(14).max()
-low14 = monthly_aapl['Low'].rolling(14).min()
-monthly_aapl['Williams %R'] = -100 * ((high14 - monthly_aapl['Close']) / (high14 - low14))
+monthly_aapl_WR = pd.DataFrame()
+monthly_aapl_return_WR = pd.DataFrame()
+high14 = monthly_aaplWR['High'].rolling(14).max()
+low14 = monthly_aaplWR['Low'].rolling(14).min()
+monthly_aapl_return_WR['Williams %R'] = -100 * ((high14 - monthly_aaplWR['Close']) / (high14 - low14))
+monthly_aapl_return_WR.dropna(inplace=True)
+
 monthly_aapl['Return'] = monthly_aapl['Close'].pct_change()
 
 #Combining Data
-data = pd.DataFrame(index=aapl.index)
-data['Williams %R'] = monthly_aapl['Williams %R']
+data = pd.DataFrame(index=monthly_aapl_return_WR.index)
+data['Williams %R'] = monthly_aapl_return_WR['Williams %R']
 data['ffunds'] = ffunds['FEDFUNDS']
+data['AAPL Return'] = monthly_aapl['Return']
 
-data.dropna(inplace=True)
+data.fillna(0, inplace=True)
 
-y = monthly_aapl['Return']
+y = data['AAPL Return']
 X = data[['Williams %R','ffunds']]
 
 def powerset(iterable):

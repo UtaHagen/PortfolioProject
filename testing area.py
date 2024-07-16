@@ -24,15 +24,17 @@ monthly_aapl_WR = pd.DataFrame()
 monthly_aapl_return_WR = pd.DataFrame()
 high14 = monthly_aaplWR['High'].rolling(14).max()
 low14 = monthly_aaplWR['Low'].rolling(14).min()
-monthly_aapl_return_WR['Williams %R'] = -100 * ((high14 - monthly_aapl['Close']) / (high14 - low14))
+monthly_aapl_return_WR['Williams %R'] = -100 * ((high14 - monthly_aaplWR['Close']) / (high14 - low14))
+monthly_aapl_return_WR.dropna(inplace=True)
 
 monthly_aapl['Return'] = monthly_aapl['Close'].pct_change()
 
 #Combining Data
-data = pd.DataFrame(index=aaplWR.index)
-data['Williams %R'] = monthly_aapl['Williams %R']
+data = pd.DataFrame(index=monthly_aapl_return_WR.index)
+data['Williams %R'] = monthly_aapl_return_WR['Williams %R']
 data['ffunds'] = ffunds['FEDFUNDS']
+data['AAPL Return'] = monthly_aapl['Return']
 
+data.fillna(0, inplace=True)
 
-
-print(monthly_aapl_return_WR)
+print(data)
