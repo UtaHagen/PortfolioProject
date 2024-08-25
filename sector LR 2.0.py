@@ -60,4 +60,4 @@ for sector_symbol in sectors_df['Sector']:
     print(f'P-Values: \n{model.pvalues}')
 
 # Save the results DataFrame to a CSV file
-results_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\results.csv', index=False)
+results_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\sector LR results.csv', index=False)
