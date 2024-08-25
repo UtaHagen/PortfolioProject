@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import yfinance as yf
 import numpy as np
 import pandas as pd
@@ -15,8 +9,11 @@ sp500_df = yf.download('^GSPC', start='2010-01-01')
 monthly_sp500 = sp500_df.resample('ME').mean()
 monthly_sp500['Return'] = (monthly_sp500['Close'].shift(-21) - monthly_sp500['Close']) / monthly_sp500['Close']
 
-sectors_path = [r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\sectorsxd - Sheet1.csv']
+sectors_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\sectorsxd - Sheet1.csv'
 sectors_df = pd.read_csv(sectors_path)
+
+# Create an empty DataFrame to store the results
+results_df = pd.DataFrame(columns=['Sector', 'Intercept', 'Coefficient', 'R^2', 'P-Value'])
 
 for sector_symbol in sectors_df['Sector']:
     print(f'Processing sector: {sector_symbol}')
@@ -45,15 +42,22 @@ for sector_symbol in sectors_df['Sector']:
 
     r2 = model.rsquared
 
+    # Store the results in the DataFrame
+    new_row = pd.DataFrame({
+        'Sector': [sector_symbol],
+        'Intercept': [model.params[0]],
+        'Coefficient': [model.params[1]],
+        'R^2': [r2],
+        'P-Value': [model.pvalues[1]]
+    })
+
+    results_df = pd.concat([results_df, new_row], ignore_index=True)
+
     print(f'Sector: {sector_symbol}')
     print(f'Intercept: {model.params[0]}')
     print(f'Coefficients: {model.params[1:]}')
     print(f'R^2 Score: {r2}')
     print(f'P-Values: \n{model.pvalues}')
 
-
-# In[ ]:
-
-
-
-
+# Save the results DataFrame to a CSV file
+results_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\results.csv', index=False)
