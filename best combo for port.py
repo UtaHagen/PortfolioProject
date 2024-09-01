@@ -2,8 +2,16 @@ from itertools import combinations
 from fractions import Fraction
 import yfinance as yf
 import pandas as pd
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor
+import logging
 
-stock_returns = [0.1,0.2,-0.2,-1,1,2]
+
+
+portfolio_pick = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\portfolio_pick.csv'
+portfolio_pick_df = pd.read_csv(portfolio_pick)
+
+stock_returns = 
 
 def highest_average_combination(stock_returns):
     max_average = float('-inf')

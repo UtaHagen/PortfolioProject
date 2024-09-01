@@ -1,30 +1,30 @@
-import yfinance as yf
 import pandas as pd
+import numpy as np
 
-results_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\results.csv'
-sectors_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\sectorsxd - Sheet1.csv'
-results_df = pd.read_csv(results_path)
-sectors_df = pd.read_csv(sectors_path)
+portfolio_pick = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\portfolio_pick.csv'
+portfolio_pick_df = pd.read_csv(portfolio_pick)
+# Assuming your DataFrame is named 'df' and has columns 'Date', 'Ticker', and 'Close'
+# Convert 'Date' column to datetime
+df['Date'] = pd.to_datetime(df['Date'])
 
-dirty_df = pd.merge(results_df, sectors_df, on='Sector', how='inner')
+# Filter data for the last 5 years
+end_date = df['Date'].max()
+start_date = end_date - pd.DateOffset(years=5)
+df = df[(df['Date'] >= start_date) & (df['Date'] <= end_date)]
 
-def get_beta(ticker):
-    try:
-        stock = yf.Ticker(ticker)
-        beta = stock.info.get('beta', None)
-        return beta
-    except Exception as e:
-        if '404' in str(e):
-            print(f"404 error for {ticker}: {e}")
-            return None
-        else:
-            print(f"Error fetching data for {ticker}: {e}")
-            return None
+# Set 'Date' as index
+df.set_index('Date', inplace=True)
 
-dirty_df['Beta'] = dirty_df['Stock'].apply(lambda x: yf.Ticker(x).info.get('beta', None))
+# Calculate monthly return
+monthly_returns = df.groupby('Ticker')['Close'].resample('M').ffill().pct_change().dropna()
 
-#cleaned_df = merged_df.dropna(subset=['Beta'])
+# Reset index to have 'Date' and 'Ticker' as columns again
+monthly_returns = monthly_returns.reset_index()
 
-research_df = dirty_df.dropna()
+# Rename the 'Close' column to 'Monthly Return'
+monthly_returns.rename(columns={'Close': 'Monthly Return'}, inplace=True)
 
-print(research_df)
+# Create a new DataFrame to store the monthly returns
+monthly_returns_df = pd.DataFrame(monthly_returns)
+
+print(monthly_returns_df.head())
