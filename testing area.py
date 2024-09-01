@@ -1,17 +1,30 @@
-import pandas as pd
 import yfinance as yf
-import pandas_ta as ta
-import statsmodels.api as sm
-from itertools import chain, combinations
+import pandas as pd
 
-#Data port + manipulation (aapl)
-aaplWR = yf.download('AAPL', start='2008-12-31', end='2024-01-01', progress=False)
-aapl = yf.download('AAPL', start='2010-01-01', end='2024-01-01', progress=False)
-monthly_aaplWR = aaplWR.resample('ME').mean()
-monthly_aapl = aapl.resample('ME').mean()
+results_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\results.csv'
+sectors_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\sectorsxd - Sheet1.csv'
+results_df = pd.read_csv(results_path)
+sectors_df = pd.read_csv(sectors_path)
 
-#Calculating RSI
-aaplRSI = pd.DataFrame()
-aaplRSI = aapl.ta.rsi(append=True)
+dirty_df = pd.merge(results_df, sectors_df, on='Sector', how='inner')
 
-print(aaplRSI)
+def get_beta(ticker):
+    try:
+        stock = yf.Ticker(ticker)
+        beta = stock.info.get('beta', None)
+        return beta
+    except Exception as e:
+        if '404' in str(e):
+            print(f"404 error for {ticker}: {e}")
+            return None
+        else:
+            print(f"Error fetching data for {ticker}: {e}")
+            return None
+
+dirty_df['Beta'] = dirty_df['Stock'].apply(lambda x: yf.Ticker(x).info.get('beta', None))
+
+#cleaned_df = merged_df.dropna(subset=['Beta'])
+
+research_df = dirty_df.dropna()
+
+print(research_df)

@@ -1,5 +1,7 @@
 from itertools import combinations
 from fractions import Fraction
+import yfinance as yf
+import pandas as pd
 
 stock_returns = [0.1,0.2,-0.2,-1,1,2]
 
