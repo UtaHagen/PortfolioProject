@@ -34,7 +34,7 @@ def monte_carlo_simulation(data, num_simulations, num_days):
     return simulations
 
 # Run the Monte Carlo simulator
-num_simulations = 1000
+num_simulations = 2500
 num_days = 252
 simulations = monte_carlo_simulation(data, num_simulations, num_days)
 

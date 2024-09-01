@@ -12,13 +12,13 @@ monthly_sp500['Return'] = (monthly_sp500['Close'].shift(-21) - monthly_sp500['Cl
 sectors_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\sectorsxd - Sheet1.csv'
 sectors_df = pd.read_csv(sectors_path)
 
-results_df = pd.DataFrame(columns=['Sector', 'Intercept', 'Coefficient', 'R^2', 'P-Value'])
+results_df = pd.DataFrame(columns=['Sector', 'Coefficient'])
 
 for sector_symbol in sectors_df['Sector']:
     print(f'Processing sector: {sector_symbol}')
     
     sector_df = yf.download(sector_symbol, start='2010-01-01')
-    monthly_sector = sector_df.resample('ME').mean()
+    monthly_sector = sector_df.resample('M').mean()
     monthly_sector['Return'] = (monthly_sector['Close'].shift(-21) - monthly_sector['Close']) / monthly_sector['Close']
 
     monthly_sp500.dropna(inplace=True)
@@ -39,13 +39,14 @@ for sector_symbol in sectors_df['Sector']:
 
     y_pred = model.predict(sm.add_constant(X_test))
 
-    r2 = model.rsquared
-
     new_row = pd.DataFrame({
         'Sector': [sector_symbol],
-        'Coefficient': [model.params[1]],
+        'Coefficient': [model.params[1]]
     })
 
     results_df = pd.concat([results_df, new_row], ignore_index=True)
 
-results_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\sector LR results.csv', index=False)
+    print(f'Sector: {sector_symbol}')
+    print(f'Coefficient: {model.params[1]}')
+
+results_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\results.csv', index=False)
