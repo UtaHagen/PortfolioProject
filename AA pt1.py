@@ -43,5 +43,7 @@ for index, row in research_df.iterrows():
         portfolio_data.append(row)
 
 portfolio_pick = pd.concat([pd.DataFrame(portfolio_data)], ignore_index=True)
+portfolio_pick = portfolio_pick[['Stock','Beta','Sector','Coefficient']]
+
 
 portfolio_pick.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\portfolio_pick.csv', index=False)

@@ -1,30 +1,66 @@
 import pandas as pd
+import yfinance as yf
 import numpy as np
+from datetime import datetime
 
 portfolio_pick = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\portfolio_pick.csv'
 portfolio_pick_df = pd.read_csv(portfolio_pick)
-# Assuming your DataFrame is named 'df' and has columns 'Date', 'Ticker', and 'Close'
-# Convert 'Date' column to datetime
-df['Date'] = pd.to_datetime(df['Date'])
 
-# Filter data for the last 5 years
-end_date = df['Date'].max()
-start_date = end_date - pd.DateOffset(years=5)
-df = df[(df['Date'] >= start_date) & (df['Date'] <= end_date)]
+def is_last_day_of_month(date):
+    next_day = date + pd.DateOffset(days=1)
+    return next_day.month != date.month
 
-# Set 'Date' as index
-df.set_index('Date', inplace=True)
+def calculate_recent_monthly_return(ticker):
+    try:
+        stock_data = yf.download(ticker, period='1y', interval='1d')
+        stock_data = stock_data.resample('ME').last()
+        stock_data['Monthly Return'] = stock_data['Adj Close'].pct_change()
+        stock_data['Ticker'] = ticker
+        
+        today = pd.Timestamp(datetime.now().date())
+        if is_last_day_of_month(today):
+            return stock_data[['Ticker', 'Monthly Return']].iloc[-1]
+        else:
+            return stock_data[['Ticker', 'Monthly Return']].iloc[-2]
+    except Exception as e:
+        print(f"Error processing ticker {ticker}: {e}")
+        return pd.Series({'Ticker': ticker, 'Monthly Return': None})
 
-# Calculate monthly return
-monthly_returns = df.groupby('Ticker')['Close'].resample('M').ffill().pct_change().dropna()
+results = []
+for ticker in portfolio_pick_df['Stock']:
+    result = calculate_recent_monthly_return(ticker)
+    results.append(result)
 
-# Reset index to have 'Date' and 'Ticker' as columns again
-monthly_returns = monthly_returns.reset_index()
+monthly_returns_df = pd.DataFrame(results)
+monthly_returns_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\monthly_returns.csv', index=False)
 
-# Rename the 'Close' column to 'Monthly Return'
-monthly_returns.rename(columns={'Close': 'Monthly Return'}, inplace=True)
+portfolio_pick = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\portfolio_pick.csv'
+portfolio_pick_df = pd.read_csv(portfolio_pick)
 
-# Create a new DataFrame to store the monthly returns
-monthly_returns_df = pd.DataFrame(monthly_returns)
+def is_last_day_of_month(date):
+    next_day = date + pd.DateOffset(days=1)
+    return next_day.month != date.month
 
-print(monthly_returns_df.head())
+def calculate_recent_monthly_return(ticker):
+    try:
+        stock_data = yf.download(ticker, period='1y', interval='1d')
+        stock_data = stock_data.resample('ME').last()
+        stock_data['Monthly Return'] = stock_data['Adj Close'].pct_change()
+        stock_data['Ticker'] = ticker
+        
+        today = pd.Timestamp(datetime.now().date())
+        if is_last_day_of_month(today):
+            return stock_data[['Ticker', 'Monthly Return']].iloc[-1]
+        else:
+            return stock_data[['Ticker', 'Monthly Return']].iloc[-2]
+    except Exception as e:
+        print(f"Error processing ticker {ticker}: {e}")
+        return pd.Series({'Ticker': ticker, 'Monthly Return': None})
+
+results = []
+for ticker in portfolio_pick_df['Stock']:
+    result = calculate_recent_monthly_return(ticker)
+    results.append(result)
+
+monthly_returns_df = pd.DataFrame(results)
+#monthly_returns_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\monthly_returns.csv', index=False)
