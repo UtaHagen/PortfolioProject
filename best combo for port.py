@@ -7,11 +7,33 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 from datetime import datetime
 
-monthly_returns_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\monthly_returns.csv'
+monthly_returns_path = r'Data\portfolio_pick.csv'
 monthly_returns = pd.read_csv(monthly_returns_path)
 
-stock_returns = monthly_returns['Monthly Return'].dropna().tolist()
-tickers = monthly_returns['Ticker'].tolist()
+def calculate_most_recent_monthly_return(ticker):
+    stock = yf.Ticker(ticker)
+    hist = stock.history(period="2mo")
+    hist['Monthly Return'] = hist['Close'].pct_change(periods=21)
+    hist = hist[['Monthly Return']].dropna()
+
+    today = datetime.today()
+    if today.day == 1:
+        most_recent_return = hist.iloc[-1]
+    else:
+        most_recent_return = hist.iloc[-2]
+
+    return most_recent_return['Monthly Return']
+
+stock_dataframes = {}
+
+for ticker in monthly_returns['Stock']:
+    stock_dataframes[ticker] = calculate_most_recent_monthly_return(ticker)
+
+result_df = pd.DataFrame(columns=['Stock', 'Monthly Return'])
+
+data = [{'Stock': ticker, 'Monthly Return': monthly_return} for ticker, monthly_return in stock_dataframes.items()]
+
+result_df = pd.DataFrame(data)
 
 def highest_average_combination(stock_returns):
     max_average = float('-inf')
@@ -26,18 +48,22 @@ def highest_average_combination(stock_returns):
 
     return best_combination, max_average
 
+stock_returns = result_df['Monthly Return'].tolist()
+tickers = result_df['Stock'].tolist()
+
 best_combination, max_avg = highest_average_combination(stock_returns)
 
-# Find the tickers corresponding to the best combination
 best_tickers = [tickers[stock_returns.index(return_val)] for return_val in best_combination]
 
-# Create a DataFrame for the best combination
+best_combination, max_avg = highest_average_combination(stock_returns)
+
+best_tickers = [tickers[stock_returns.index(return_val)] for return_val in best_combination]
+
 best_combination_df = pd.DataFrame({
-    'Ticker': best_tickers,
+    'Stock': best_tickers,
     'Monthly Return': best_combination
 })
 
-# Save the DataFrame to a CSV file
 file_path = r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\best_combination.csv'
 best_combination_df.to_csv(file_path, index=False)
 
