@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime
 
+# Load the portfolio data
 monthly_returns_path = r'Data\portfolio_pick.csv'
 monthly_returns = pd.read_csv(monthly_returns_path)
 
@@ -12,20 +13,18 @@ def calculate_most_recent_monthly_return(ticker):
     hist = hist[['Monthly Return']].dropna()
 
     today = datetime.today()
-    if today.day == 1:
-        most_recent_return = hist.iloc[-1]
-    else:
-        most_recent_return = hist.iloc[-2]
+    most_recent_return = hist.iloc[-1] if today.day == 1 else hist.iloc[-2]
 
     return most_recent_return['Monthly Return']
 
-stock_dataframes = {}
+# Calculate monthly returns for each stock
+stock_dataframes = {ticker: calculate_most_recent_monthly_return(ticker) for ticker in monthly_returns['Stock']}
 
-for ticker in monthly_returns['Stock']:
-    stock_dataframes[ticker] = calculate_most_recent_monthly_return(ticker)
+# Create a DataFrame with the results
+result_df = pd.DataFrame(list(stock_dataframes.items()), columns=['Stock', 'Monthly Return'])
 
-result_df = pd.DataFrame(columns=['Stock', 'Monthly Return'])
+# Get the top 10 tickers with the highest returns
+top_10_df = result_df.nlargest(10, 'Monthly Return')
 
-data = [{'Stock': ticker, 'Monthly Return': monthly_return} for ticker, monthly_return in stock_dataframes.items()]
-
-result_df = pd.DataFrame(data)
+# Output the result to a CSV file
+top_10_df.to_csv('top10portfoliopick.csv', index=False)
