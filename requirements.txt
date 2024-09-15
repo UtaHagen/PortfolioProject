@@ -1,2 +1,15 @@
 pandas
 yfinance
+papermill
+statsmodels
+sklearn
+matplotlib
+pandas_datareader
+numpy
+pypfopt
+PyPortfolioOpt
+pandas_ta
+xgboost
+requests
+tkinter
+io
