@@ -93,3 +93,11 @@ for (name in names(bt_summary)) {
   cat("\nSummary for period:", name, "\n")
   summaryTable(bt_summary[[name]])
 }
+# Convert the backtest result into a dataframe if needed
+backtest_df <- as.data.frame(bt_summary)
+
+ # Save to CSV file
+ write.csv(backtest_df, file = "backtest_results_2015-11-23_to_2017-11-21.csv", row.names = FALSE)
+ 
+ # Repeat for other periods or adjust file names accordingly
+ write.csv(backtest_df, file = "/Users/allison/Downloads/backtest_results.csv", row.names = FALSE)
