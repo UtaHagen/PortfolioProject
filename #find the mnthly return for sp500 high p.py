@@ -47,5 +47,4 @@ for ticker in top_10_tickers.index:
 
 top_10_info_df = pd.DataFrame.from_dict(top_10_info, orient='index')
 
-print("Top 10 Tickers with Highest Monthly Return:\n", top_10_tickers)
-print("\nAll Available Information for Top 10 Tickers:\n", top_10_info_df)
+top_10_info_df.to_csv(r'C:\Users\bsung\OneDrive\Documents\GitHub\PortfolioProject\Data\top 10 info.csv', index=False)
