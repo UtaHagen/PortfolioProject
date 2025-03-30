@@ -1,31 +1,38 @@
-import numpy as np
+import os
 import pandas as pd
 import yfinance as yf
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split, GridSearchCV
-
 
 file_path = r'Data\portfolio_pick.csv'
-df_tickers = pd.read_csv(file_path)  # Replace with your actual file path
-tickers = df_tickers['Stock'].tolist()  # Replace 'Stock' with the actual column name in your CSV
+df_tickers = pd.read_csv(file_path)
+tickers = df_tickers['Stock'].tolist()
+base_folder = r"Data Exploration\Brian's Playground"
+subfolder = os.path.join(base_folder, "Testing Data")
 
-# Initialize an empty list to store data
-stock_data = []
+# Create subfolder if it doesn't exist
+os.makedirs(subfolder, exist_ok=True)
 
-# Download historical data for each ticker
+data = yf.download(tickers, start='2015-01-01', end='2021-09-12', group_by='ticker')
+
 for ticker in tickers:
-    data = yf.download(ticker, start="2020-01-01", end="2025-01-01")  # Specify date range as needed
-    data['Stock'] = ticker  # Add the ticker to each row of data
-    stock_data.append(data)
+    if ticker in data:  # Ensure the ticker exists in the dataset
+        stock_data = data[ticker].copy()  # Extract data for the specific ticker
+        
+        # Check if "Adj Close" exists, otherwise use "Close"
+        if 'Adj Close' in stock_data.columns:
+            stock_data.insert(0, 'Price', stock_data['Adj Close'])
+        elif 'Close' in stock_data.columns:
+            stock_data.insert(0, 'Price', stock_data['Close'])
+        else:
+            print(f"Skipping {ticker}: No 'Adj Close' or 'Close' column found.")
+            continue  # Skip to the next ticker if neither column exists
 
-# Concatenate all the stock data into a single dataframe
-final_df = pd.concat(stock_data)
+        # Ensure correct column order
+        required_columns = ['Price', 'Close', 'High', 'Low', 'Open', 'Volume']
+        available_columns = [col for col in required_columns if col in stock_data.columns]
+        stock_data = stock_data[available_columns]  # Keep only available columns
 
-# Reset the index to make the 'Date' column a regular column
-final_df.reset_index(inplace=True)
+        # Define the full CSV file path inside the "Testing Data" subfolder
+        file_path = os.path.join(subfolder, f"{ticker}.csv")
 
-# Preview the final dataframe
-print(final_df.head())
+        # Save to CSV
+        stock_data.to_csv(file_path, index=True)
