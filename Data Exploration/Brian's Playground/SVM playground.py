@@ -9,9 +9,9 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 
 
 file_path = r'Data\portfolio_pick.csv'
-df = pd.read_csv(file_path)
+file_data = pd.read_csv(file_path)
 
-tickers = df['Stock'].tolist()
+tickers = file_data['Stock'].tolist()
 
 stock_data = {}
 
@@ -21,9 +21,6 @@ for ticker in tickers:
         stock_data[ticker] = data
     except Exception as e:
         print(f"Could not download data for {ticker}: {e}")
-
-print(stock_data)
-
 
 def create_features(stock_data, n_forward=10):
     """Creates technical indicators and target variable."""
@@ -98,9 +95,8 @@ def predict_buy_signals(model, scaler, new_data, feature_columns):
 def run_stock_svm_analysis(filepath, start_date="2020-01-01", prediction_days=10):
     """Runs the full SVM analysis pipeline."""
     try:
-        stock_dict = load_stock_data(filepath, start_date)  # Load stock data dictionary
 
-        for ticker, stock_data in stock_dict.items():
+        for ticker, stock_data in stock_data.items():
             print(f"\n📊 Running SVM analysis for {ticker}...")
 
             # Feature Engineering
@@ -115,7 +111,7 @@ def run_stock_svm_analysis(filepath, start_date="2020-01-01", prediction_days=10
             print("\nRecent Buy Signals:")
             print(signals[['Close', 'Buy_Probability', 'Buy_Signal']].tail(5))
         
-        return stock_dict  # Return stock data dictionary for further analysis
+        return stock_data  # Return stock data dictionary for further analysis
 
     except Exception as e:
         print(f"❌ ERROR: {e}")
