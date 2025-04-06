@@ -1,3 +1,6 @@
+#Looks like I was doing something with the Fed Rate and aapl + sp 500 in a LR?
+# incomplete + functional?
+
 import pandas as pd
 import yfinance as yf
 from sklearn.model_selection import train_test_split

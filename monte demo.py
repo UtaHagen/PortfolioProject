@@ -1,3 +1,5 @@
+#This is a monte carlo stim - functional but incomplete, the graph is trunc to a specific period and I haven't figured out how to fix it yet
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

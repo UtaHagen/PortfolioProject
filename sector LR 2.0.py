@@ -1,3 +1,5 @@
+#This generates the results.csv file with all of the sector and their coefficients for future performance?
+
 import yfinance as yf
 import numpy as np
 import pandas as pd

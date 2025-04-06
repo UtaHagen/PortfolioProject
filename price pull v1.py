@@ -1,3 +1,6 @@
+#I think this is also me but I think this just grab data based on what a user inputs in the UI...
+# INCOMPLETE and NON-FUNC
+
 import yfinance as yf
 import pandas as pd
 import requests

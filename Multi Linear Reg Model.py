@@ -1,3 +1,6 @@
+#This is MLR model to look at the correlation (or lack thereof) between an example ticker + sp500 with different macro elements
+# INCOMPLETE
+
 import yfinance as yf
 import pandas as pd
 import statsmodels.api as sm

@@ -1,3 +1,6 @@
+#I think this was created to test the monthly period?
+#is functional but I don't know why this exists lol
+
 import pandas as pd
 import yfinance as yf
 from sklearn.model_selection import train_test_split
