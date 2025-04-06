@@ -1,3 +1,5 @@
+#I think this was a combinatorics model used to figure out which method would be the best at choosing stocks
+
 import pandas as pd
 import pandas_ta as ta
 import yfinance as yf

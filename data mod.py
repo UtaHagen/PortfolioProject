@@ -1,3 +1,5 @@
+#I think I was doing some data clean up for what probably was a LR between aapl and sp500 returns
+
 import pandas as pd
 import yfinance as yf
 

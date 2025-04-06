@@ -1,3 +1,5 @@
+#This is where I test and build different versions of the SVM + identify where things are broken
+
 import numpy as np
 import pandas as pd
 import yfinance as yf

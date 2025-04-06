@@ -1,3 +1,5 @@
+#This was the foundation of choosing stocks based on their beta and if their sectors are doing well/not well.
+
 import yfinance as yf
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor

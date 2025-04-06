@@ -1,3 +1,5 @@
+#this is where I isolate problematic parts and figure out why they are breaking
+
 import os
 import pandas as pd
 import yfinance as yf

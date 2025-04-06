@@ -1,3 +1,7 @@
+#this was a coded combinatorics model to find the best combo of stocks based on what would provide the highest average return
+#but this is ultimately flawed since this code will always output the stock with the highest return since the average return on of the one
+#is not an average that can be outcompeted by the other combo
+
 from itertools import combinations
 from fractions import Fraction
 import yfinance as yf

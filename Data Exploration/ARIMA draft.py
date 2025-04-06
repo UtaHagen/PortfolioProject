@@ -1,3 +1,5 @@
+#This is a time series forecasting model call ARIMA - incomplete!
+
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,7 +28,7 @@ monthly_average.plot(label = tickerSymbol)
 def difference(monthly_average, interval=1):
  diff = list()
  for i in range(interval, len(dataset)):
- value = dataset[i] - dataset[i - interval]
+    value = dataset[i] - dataset[i - interval]
  diff.append(value)
  return Series(diff)
 
