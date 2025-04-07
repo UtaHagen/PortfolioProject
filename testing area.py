@@ -1,3 +1,5 @@
+#seems like a Brian thing...not needed at all lol
+
 import requests
 
 # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
