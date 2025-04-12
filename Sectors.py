@@ -1,3 +1,5 @@
+#Random forest model to predict if each stock will under/overperform its respective sector
+
 import pandas as pd
 import yfinance as yf
 import numpy as np
