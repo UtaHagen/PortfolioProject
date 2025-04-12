@@ -3,6 +3,8 @@
 
 # In[4]:
 
+#This script calculates technical indicators for each S&P 500 ticker.
+
 
 #could not find current web reference for ROC,CMO,PPO, Shiller's PE to check calculation output 
 #maybe double check those, first time calculating them
