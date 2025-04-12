@@ -1,3 +1,5 @@
+#Use R package to backtest portfolio over one period and get summary statistics
+
 library(readr)     
 library(quantmod)     
 library(portfolioBacktest) 
