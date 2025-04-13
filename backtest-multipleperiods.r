@@ -1,3 +1,4 @@
+#Script to backtest portfolio over 10 defined periods. To do over more periods, just add more dates. 
 # Load necessary libraries
 library(readr)     
 library(quantmod)     
