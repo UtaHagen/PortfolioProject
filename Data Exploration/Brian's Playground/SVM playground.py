@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import pickle
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -264,7 +265,7 @@ def train_svm_model(features_df, feature_columns=None, target_column='Target'):
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
     plt.tight_layout()
-    plt.show()
+    #plt.show()
     
     # Plot ROC curve
     from sklearn.metrics import roc_curve, auc
@@ -280,7 +281,7 @@ def train_svm_model(features_df, feature_columns=None, target_column='Target'):
     plt.ylabel('True Positive Rate')
     plt.title('Receiver Operating Characteristic')
     plt.legend(loc="lower right")
-    plt.show()
+    #plt.show()
     
     # Feature importance analysis
     if best_model.kernel == 'linear':
@@ -294,7 +295,7 @@ def train_svm_model(features_df, feature_columns=None, target_column='Target'):
         plt.xlabel('Importance')
         plt.title('Top 10 Feature Importance')
         plt.gca().invert_yaxis()
-        plt.show()
+        #plt.show()
         
     return best_model, scaler, feature_columns
 
@@ -361,7 +362,7 @@ def plot_signals(stock_data_with_signals, start_idx=None, end_idx=None, ticker='
         plt.plot(plot_data.index, plot_data['MACD'], label='MACD')
         plt.plot(plot_data.index, plot_data['MACD_Signal'], label='Signal')
     
-    plt.title('Technical Indicators')
+    #plt.title('Technical Indicators')
     plt.legend()
     plt.grid(True, alpha=0.3)
     
@@ -376,7 +377,7 @@ def plot_signals(stock_data_with_signals, start_idx=None, end_idx=None, ticker='
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.show()
+    #plt.show()  # 
 
 def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, commission=0.001):
     """
@@ -476,7 +477,7 @@ def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, 
         plt.xlabel('Trade Number')
         plt.ylabel('Capital ($)')
         plt.grid(True, alpha=0.3)
-        plt.show()
+        #plt.show()
         
         # Plot drawdown
         plt.figure(figsize=(12, 6))
@@ -486,7 +487,7 @@ def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, 
         plt.xlabel('Trade Number')
         plt.ylabel('Drawdown (%)')
         plt.grid(True, alpha=0.3)
-        plt.show()
+        #plt.show()
         
         return trades_df, equity[-1] / equity[0] - 1
     else:
@@ -573,6 +574,10 @@ def batch_analyze_stocks(csv_folder_path, prediction_days=10):
     # Results storage
     results = {}
     
+    # Path to save results
+    results_folder_path = os.path.join(csv_folder_path, "..", "SVM Results")
+    os.makedirs(results_folder_path, exist_ok=True)  # Create the folder if it doesn't exist
+
     # Process each file
     for csv_file in csv_files:
         print(f"\n{'='*50}")
@@ -597,6 +602,18 @@ def batch_analyze_stocks(csv_folder_path, prediction_days=10):
                 'scaler': scaler,
                 'features': features
             }
+
+            # Save model, scaler, and signals to files
+            model_file = os.path.join(results_folder_path, f"{ticker}_model.pkl")
+            scaler_file = os.path.join(results_folder_path, f"{ticker}_scaler.pkl")
+            signals_file = os.path.join(results_folder_path, f"{ticker}_signals.csv")
+            
+            with open(model_file, 'wb') as f:
+                pickle.dump(model, f)
+            with open(scaler_file, 'wb') as f:
+                pickle.dump(scaler, f)
+            signals.to_csv(signals_file, index=True)
+            print(f"Saved results for {ticker} to {results_folder_path}")
     
     # Print summary
     print("\n===== Analysis Summary =====")
