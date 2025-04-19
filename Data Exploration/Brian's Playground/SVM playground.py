@@ -265,7 +265,7 @@ def train_svm_model(features_df, feature_columns=None, target_column='Target'):
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
     plt.tight_layout()
-    #plt.show()
+    plt.savefig('confusion_matrix.png')  # Save the figure instead of showing it
     
     # Plot ROC curve
     from sklearn.metrics import roc_curve, auc
@@ -281,7 +281,7 @@ def train_svm_model(features_df, feature_columns=None, target_column='Target'):
     plt.ylabel('True Positive Rate')
     plt.title('Receiver Operating Characteristic')
     plt.legend(loc="lower right")
-    #plt.show()
+    plt.savefig('roc_curve.png')  # Save the ROC curve plot
     
     # Feature importance analysis
     if best_model.kernel == 'linear':
@@ -295,7 +295,7 @@ def train_svm_model(features_df, feature_columns=None, target_column='Target'):
         plt.xlabel('Importance')
         plt.title('Top 10 Feature Importance')
         plt.gca().invert_yaxis()
-        #plt.show()
+        plt.savefig('feature_importance.png')  # Save the feature importance plot
         
     return best_model, scaler, feature_columns
 
@@ -319,7 +319,7 @@ def predict_buy_signal(model, scaler, new_data, feature_columns):
     
     return new_data
 
-def plot_signals(stock_data_with_signals, start_idx=None, end_idx=None, ticker='Stock'):
+def plot_signals(stock_data_with_signals, start_idx=None, end_idx=None, ticker='Stock', save_path=None):
     """
     Plot the stock price with buy signals
     """
@@ -377,11 +377,17 @@ def plot_signals(stock_data_with_signals, start_idx=None, end_idx=None, ticker='
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    #plt.show()  # 
+    
+    if save_path:
+        filename = os.path.join(save_path, f"{ticker}_signals_plot.png")
+        plt.savefig(filename)
+        print(f"Saved plot to {filename}")
+    
+    plt.close()  # Close the plot to free memory
 
-def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, commission=0.001):
+def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, commission=0.001, save_path=None, ticker='Stock'):
     """
-    Analyze the performance of the trading strategy
+    Analyze the performance of the trading strategy and save performance graphs.
     """
     # Create a copy of the data
     df = stock_data_with_signals.copy()
@@ -428,16 +434,6 @@ def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, 
         # Convert trades to DataFrame
         trades_df = pd.DataFrame(trades)
         
-        # Calculate performance statistics
-        total_trades = len(trades_df)
-        winning_trades = sum(trades_df['Return'] > 0)
-        losing_trades = sum(trades_df['Return'] <= 0)
-        win_rate = winning_trades / total_trades if total_trades > 0 else 0
-        
-        avg_win = trades_df.loc[trades_df['Return'] > 0, 'Return'].mean() if winning_trades > 0 else 0
-        avg_loss = trades_df.loc[trades_df['Return'] <= 0, 'Return'].mean() if losing_trades > 0 else 0
-        profit_factor = abs(avg_win * winning_trades / (avg_loss * losing_trades)) if losing_trades > 0 and avg_loss < 0 else 0
-        
         # Calculate equity curve
         equity = [initial_capital]
         for ret in trades_df['Return']:
@@ -446,29 +442,6 @@ def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, 
         # Calculate drawdown
         max_equity = pd.Series(equity).cummax()
         drawdown = (pd.Series(equity) / max_equity - 1) * 100
-        max_drawdown = drawdown.min()
-        
-        # Calculate CAGR (Compound Annual Growth Rate)
-        if len(trades_df) > 1:
-            start_date = trades_df['Entry_Date'].min()
-            end_date = trades_df['Exit_Date'].max()
-            years = (end_date - start_date).days / 365.25
-            cagr = ((equity[-1] / equity[0]) ** (1/years) - 1) * 100 if years > 0 else 0
-        else:
-            cagr = 0
-        
-        # Print performance summary
-        print("\n===== Trading Performance Summary =====")
-        print(f"Initial Capital: ${initial_capital:.2f}")
-        print(f"Final Capital: ${equity[-1]:.2f}")
-        print(f"Net Profit: ${equity[-1] - initial_capital:.2f} ({(equity[-1]/initial_capital - 1) * 100:.2f}%)")
-        print(f"CAGR: {cagr:.2f}%")
-        print(f"Maximum Drawdown: {max_drawdown:.2f}%")
-        print(f"Total Trades: {total_trades}")
-        print(f"Win Rate: {win_rate:.2f} ({winning_trades}/{total_trades})")
-        print(f"Average Win: {avg_win*100:.2f}%")
-        print(f"Average Loss: {avg_loss*100:.2f}%")
-        print(f"Profit Factor: {profit_factor:.2f}")
         
         # Plot equity curve
         plt.figure(figsize=(12, 6))
@@ -477,7 +450,13 @@ def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, 
         plt.xlabel('Trade Number')
         plt.ylabel('Capital ($)')
         plt.grid(True, alpha=0.3)
-        #plt.show()
+        
+        if save_path:
+            equity_curve_path = os.path.join(save_path, f"{ticker}_equity_curve.png")
+            plt.savefig(equity_curve_path)
+            print(f"Saved equity curve to {equity_curve_path}")
+        
+        plt.close()
         
         # Plot drawdown
         plt.figure(figsize=(12, 6))
@@ -487,7 +466,13 @@ def analyze_trading_performance(stock_data_with_signals, initial_capital=10000, 
         plt.xlabel('Trade Number')
         plt.ylabel('Drawdown (%)')
         plt.grid(True, alpha=0.3)
-        #plt.show()
+        
+        if save_path:
+            drawdown_curve_path = os.path.join(save_path, f"{ticker}_drawdown_curve.png")
+            plt.savefig(drawdown_curve_path)
+            print(f"Saved drawdown curve to {drawdown_curve_path}")
+        
+        plt.close()
         
         return trades_df, equity[-1] / equity[0] - 1
     else:
